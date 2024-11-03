@@ -4,13 +4,61 @@
 let blogList = [];
 let blogMenu = [];
 let isInitData = false;
+// 로컬 데이터 사용 설정
+const isLocal = true; // 로컬 데이터 사용 강제 설정
 
+// JSON 파일 경로 설정
+const localBlogListPath = './local_blogList.json';
+const localBlogMenuPath = './local_blogMenu.json';
+
+// 블로그 리스트 초기화 함수
 async function initDataBlogList() {
-    /*
-    blogList를 초기화 하기 위한 함수
-    if 로컬이라면 blogList = /data/local_blogList.json 데이터 할당
-    else if 배포상태이면 blogList = GitHub에 API 데이터 할당
-    */
+    try {
+        if (isLocal) {
+            // 로컬 JSON 파일에서 blogList 데이터를 가져옴
+            const response = await fetch(localBlogListPath);
+            const data = await response.json();
+            return data;
+        } else {
+            // GitHub API에서 blogList 데이터를 가져옴
+            const response = await fetch(`https://api.github.com/repos/${siteConfig.username}/${siteConfig.repositoryName}/contents/blog`);
+            const data = await response.json();
+            return data;
+        }
+    } catch (error) {
+        console.error('Error loading blogList:', error);
+        return null;
+    }
+}
+
+// 블로그 메뉴 초기화 함수
+async function initDataBlogMenu() {
+    try {
+        if (isLocal) {
+            // 로컬 JSON 파일에서 blogMenu 데이터를 가져옴
+            const response = await fetch(localBlogMenuPath);
+            const data = await response.json();
+            return data;
+        } else {
+            // GitHub API에서 blogMenu 데이터를 가져옴
+            const response = await fetch(`https://api.github.com/repos/${siteConfig.username}/${siteConfig.repositoryName}/contents/menu`);
+            const data = await response.json();
+            return data;
+        }
+    } catch (error) {
+        console.error('Error loading blogMenu:', error);
+        return null;
+    }
+}
+
+export { initDataBlogList, initDataBlogMenu };
+/*
+async function initDataBlogList() {
+    
+    //blogList를 초기화 하기 위한 함수
+    //if 로컬이라면 blogList = /data/local_blogList.json 데이터 할당
+    //else if 배포상태이면 blogList = GitHub에 API 데이터 할당
+    
     if (blogList.length > 0) {
         // blogList 데이터가 이미 있을 경우 다시 로딩하지 않기 위함(API 호출 최소화)
         return blogList;
@@ -51,7 +99,7 @@ async function initDataBlogList() {
         }
         // 배포 상태에서 Local data를 사용(이용자가 많을 때)
         blogList = await response.json();
-    }
+    } 
 
     // console.log(blogList);
 
@@ -108,4 +156,4 @@ async function initDataBlogMenu() {
         blogMenu = await response.json();
     }
     return blogMenu;
-}
+}*/
